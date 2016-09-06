@@ -43,6 +43,20 @@ System Clock  = 8MHz
  #define MY_RADIO_NRF24
  //#define MY_RADIO_RFM69
 
+ #define MY_NODE_ID 20
+ /*Makes this static so won't try and find another parent if communication with
+ gateway fails*/
+ #define MY_PARENT_NODE_ID 0
+
+ /*These are actually the default pins expected by the MySensors framework.
+  * This means we can use the default constructor without arguments when
+  * creating an instance of the Mysensors class. Other defaults will include
+  * transmitting on channel 76 with a data rate of 250kbps.
+  */
+ #define MY_RF24_CE_PIN 9
+ #define MY_RF24_CS_PIN 10
+ #define MY_RF24_CHANNEL 100
+
 #include <SPI.h>
 #include <MySensors.h>
 #include <Wire.h>
@@ -54,19 +68,6 @@ System Clock  = 8MHz
 // the controller
 #define FORCE_TRANSMIT_INTERVAL 3
 #define SLEEP_TIME 300000
-
-//#define NODE_ID 7
-//#define NODE_ID 8
-#define NODE_ID 20
-
-
-/*These are actually the default pins expected by the MySensors framework.
- * This means we can use the default constructor without arguments when
- * creating an instance of the Mysensors class. Other defaults will include
- * transmitting on channel 76 with a data rate of 250kbps.
- */
-#define RF24_CE_PIN 9
-#define RF24_CS_PIN 10
 
 #define CHILD_ID_HUMIDITY 0
 #define CHILD_ID_TEMP 1
