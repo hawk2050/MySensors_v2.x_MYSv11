@@ -46,7 +46,7 @@ System Clock  = 8MHz
 #include <SPI.h>
 #include <MySensors.h>
 #include <Wire.h>
-#include "HTU21D.h"
+#include "SparkFunHTU21D.h"
 #include <stdint.h>
 #include <math.h>
 
@@ -195,9 +195,9 @@ void readHTU21DHumidity(bool force)
     #endif
   }
 }
-#endif
 
-#if SI7021_ENABLE
+
+#ifdef SI7021_ENABLE
 void readSI7021TempHumidity(bool force)
 {
   static float lastTemp = 0;
