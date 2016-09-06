@@ -33,6 +33,10 @@ Mys_v1.1 board compatible with Arduino PRO Mini 3.3V@8MHz
 
 System Clock  = 8MHz
 
+Information on porting a 1.5.x compatible sketch to 2.0.x
+
+https://forum.mysensors.org/topic/4276/converting-a-sketch-from-1-5-x-to-2-0-x/2
+
  */
 
  // Enable debug prints to serial monitor
@@ -99,6 +103,27 @@ uint8_t clockSwitchCount = 0;
 /**********************************/
 /********* IMPLEMENTATION *********/
 /**********************************/
+/*If you need to do initialization before the MySensors library starts up,
+define a before() function */
+void before()
+{
+
+}
+
+/*To handle received messages, define the following function in your sketch*/
+void receive(const MyMessage &message)
+{
+  /*Handle incoming message*/
+}
+
+/* If your node requests time using requestTime(). The following function is
+used to pick up the response*/
+void receiveTime(unsigned long ts)
+{
+}
+
+/*You can still use setup() which is executed AFTER mysensors has been
+initialised.*/
 void setup()
 {
   analogReference(INTERNAL);
@@ -128,8 +153,7 @@ void loop()
 
   // When we wake up the 5th time after power on, switch to 4Mhz clock
   // This allows us to print debug messages on startup (as serial port is dependend on oscilator settings).
-  // Switch to 1Mhz for the reminder of the sketch, save power and allow operation down to 1.8V
-  //BUG: loopCount nevers gets to 5 since it's reset to 0 after it gets above FORCE_TRANSMIT_INTERVAL
+  // Switch to 4Mhz for the reminder of the sketch, save power and allow operation down to 1.8V
   if ( (clockSwitchCount == 5) && highfreq)
   {
     switchClock(1<<CLKPS0); //should divide by 2 giving 4MHz operation
