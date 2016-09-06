@@ -41,7 +41,7 @@ https://forum.mysensors.org/topic/4276/converting-a-sketch-from-1-5-x-to-2-0-x/2
 
  // Enable debug prints to serial monitor
  #define MY_DEBUG
- #define DEBUG_RCC 0
+ #define DEBUG_RCC 1
 
  // Enable and select radio type attached
  #define MY_RADIO_NRF24
@@ -61,17 +61,18 @@ https://forum.mysensors.org/topic/4276/converting-a-sketch-from-1-5-x-to-2-0-x/2
  #define MY_RF24_CS_PIN 10
  #define MY_RF24_CHANNEL 100
 
-#include <SPI.h>
+//#include <SPI.h>
 #include <MySensors.h>
 #include <Wire.h>
 #include "SparkFunHTU21D.h"
-#include <stdint.h>
-#include <math.h>
+//#include <stdint.h>
+//#include <math.h>
 
 // FORCE_TRANSMIT_INTERVAL, this number of times of wakeup, the sensor is forced to report all values to
 // the controller
 #define FORCE_TRANSMIT_INTERVAL 3
-#define SLEEP_TIME 300000
+//#define SLEEP_TIME 300000
+#define SLEEP_TIME 5000
 
 #define CHILD_ID_HUMIDITY 0
 #define CHILD_ID_TEMP 1
@@ -91,7 +92,8 @@ MyMessage msgVolt(CHILD_ID_VOLTAGE, V_VOLTAGE);
 
 uint16_t readVcc();
 void switchClock(unsigned char clk);
-bool highfreq = true;
+/*Set true to have clock throttle back, or false to not throttle*/
+bool highfreq = false;
 
 boolean receivedConfig = false;
 boolean metric = true;
