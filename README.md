@@ -3,5 +3,5 @@ A MySensors v2.0 compatible sketch for the node hardware based on the MYSv11 PCB
 Structure of project is PlaformIO compatible (>=v3.0.0b13 of the PlatformIO CLI, IDE v1.4.0)
 
 nRF24L01+ configuration
-#define RF24_CE_PIN 9
-#define RF24_CS_PIN 10
+RF24_CE_PIN 9
+RF24_CS_PIN 10
