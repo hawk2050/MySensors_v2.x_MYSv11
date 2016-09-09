@@ -138,7 +138,7 @@ void presentation()
    // Send the sketch version information to the gateway and Controller
    sendSketchInfo("mys_v11-temp-hum", "0.5");
    // Register all sensors to gateway (they will be created as child devices)
-   present(CHILD_ID_VOLTAGE, S_CUSTOM);
+   present(CHILD_ID_VOLTAGE, S_MULTIMETER);
    present(CHILD_ID_HUMIDITY, S_HUM);
    present(CHILD_ID_TEMP, S_TEMP);
 }
