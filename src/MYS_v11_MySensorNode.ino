@@ -51,6 +51,7 @@ https://forum.mysensors.org/topic/4276/converting-a-sketch-from-1-5-x-to-2-0-x/2
  /*Makes this static so won't try and find another parent if communication with
  gateway fails*/
  #define MY_PARENT_NODE_ID 0
+ #define MY_PARENT_NODE_IS_STATIC
 
  /*These are actually the default pins expected by the MySensors framework.
   * This means we can use the default constructor without arguments when
@@ -93,7 +94,7 @@ MyMessage msgVolt(CHILD_ID_VOLTAGE, V_VOLTAGE);
 uint16_t readVcc();
 void switchClock(unsigned char clk);
 /*Set true to have clock throttle back, or false to not throttle*/
-bool highfreq = false;
+bool highfreq = true;
 
 boolean receivedConfig = false;
 boolean metric = true;
