@@ -1,7 +1,0 @@
-{
-    "terminal.integrated.env.linux": {
-        "PATH": "/home/richard/.platformio/penv/bin:/home/richard/.platformio/penv:/home/richard/apps/adb-fastboot:/home/richard/.nvm/versions/node/v8.1.2/bin:/home/richard/apps/anaconda2/bin:/home/richard/apps/adb-fastboot:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin",
-        "PLATFORMIO_CALLER": "vscode"
-    },
-    "C_Cpp.dimInactiveRegions": true
-}
