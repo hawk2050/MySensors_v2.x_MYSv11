@@ -41,10 +41,10 @@ https://forum.mysensors.org/topic/4276/converting-a-sketch-from-1-5-x-to-2-0-x/2
 
  // Enable debug prints to serial monitor
  #define MY_DEBUG
- #define DEBUG_RCC 1
+ #define DEBUG_RCC 0
 
  // Enable and select radio type attached
- #define MY_RADIO_NRF24
+ #define MY_RADIO_RF24
  //#define MY_RADIO_RFM69
 
  #define MY_NODE_ID 21
@@ -76,11 +76,6 @@ https://forum.mysensors.org/topic/4276/converting-a-sketch-from-1-5-x-to-2-0-x/2
 // Sleep time between sensor updates (in milliseconds)
 static const uint64_t UPDATE_INTERVAL = 10000;
 
-// Force sending an update of the temperature after n sensor reads, so a controller showing the
-// timestamp of the last update doesn't show something like 3 hours in the unlikely case, that
-// the value didn't change since;
-// i.e. the sensor would force sending an update every UPDATE_INTERVAL*FORCE_UPDATE_N_READS [ms]
-static const uint8_t FORCE_UPDATE_N_READS = 3;
 
 enum child_id_t
 {
@@ -183,7 +178,7 @@ void loop()
   
   
   // When we wake up the 5th time after power on, switch to 1Mhz clock
-  // This allows us to print debug messages on startup (as serial port is dependend on oscilator settings).
+  // This allows us to print debug messages on startup (as serial port is dependent on oscillator settings).
   if ( (clockSwitchCount == 5) && highfreq)
   {
     /* Switch to 1Mhz by setting clock prescaler to divide by 16 for the reminder of the sketch, 
