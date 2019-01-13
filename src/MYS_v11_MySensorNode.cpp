@@ -40,7 +40,7 @@ https://forum.mysensors.org/topic/4276/converting-a-sketch-from-1-5-x-to-2-0-x/2
  */
 
  // Enable debug prints to serial monitor
- #define MY_DEBUG
+ //#define MY_DEBUG
  #define DEBUG_RCC 0
 
  // Enable and select radio type attached
@@ -74,7 +74,7 @@ https://forum.mysensors.org/topic/4276/converting-a-sketch-from-1-5-x-to-2-0-x/2
 #define TEMP_HUM_SENSOR 0
 
 // Sleep time between sensor updates (in milliseconds)
-static const uint64_t UPDATE_INTERVAL = 10000;
+static const uint64_t UPDATE_INTERVAL = 30000;
 
 
 enum child_id_t
