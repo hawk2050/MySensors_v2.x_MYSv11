@@ -74,7 +74,8 @@ https://forum.mysensors.org/topic/4276/converting-a-sketch-from-1-5-x-to-2-0-x/2
 #define TEMP_HUM_SENSOR 0
 
 // Sleep time between sensor updates (in milliseconds)
-static const uint64_t UPDATE_INTERVAL = 30000;
+static const uint64_t DAY_UPDATE_INTERVAL_MS = 30000;
+static const uint64_t NIGHT_UPDATE_INTERVAL_MS = 900000;//15 mins
 
 
 enum child_id_t
@@ -98,7 +99,7 @@ uint8_t clockSwitchCount = 0;
 #if UV_SENSOR
 UVIS25 UV; //Ultraviolet sensor
 MyMessage msgUVindex(CHILD_ID_UV, V_UV);
-void readUVSensor(bool force);
+uint8_t readUVSensor(bool force);
 #endif
 
 #if TEMP_HUM_SENSOR
@@ -172,9 +173,13 @@ void presentation()
 void loop()
 {
 
+  uint8_t uvi;
+  uint64_t update_interval_ms = DAY_UPDATE_INTERVAL_MS;
+  uint16_t night_count = 0;
   loopCount++;
   clockSwitchCount++;
   bool forceTransmit = true;
+  
   
   
   // When we wake up the 5th time after power on, switch to 1Mhz clock
@@ -197,16 +202,38 @@ void loop()
 #endif
 
 #if UV_SENSOR
-  readUVSensor(forceTransmit);
+  uvi = readUVSensor(forceTransmit);
+
+  /*If UVI is 0 then we're assuming it's late in day so readings aren't interesting. This has to happen several times
+  in a row before we switch our sleep interval to the night mode*/
+  if (uvi == 0)
+  {
+    ++night_count;  
+  }
+  else
+  {
+    /*Some daylight is returning*/
+    night_count = 0;
+
+  }
+
+  if(night_count > 10)
+  {
+    update_interval_ms = NIGHT_UPDATE_INTERVAL_MS;
+  }
+  else
+  {
+    update_interval_ms = DAY_UPDATE_INTERVAL_MS;
+  }
+  
 #endif
 
-  sleep(UPDATE_INTERVAL);
-
+  sleep(update_interval_ms);
 
 }
 
 #if UV_SENSOR
-void readUVSensor(bool force)
+uint8_t readUVSensor(bool force)
 {
   static uint8_t lastUV = 0;
 
@@ -227,8 +254,15 @@ void readUVSensor(bool force)
     Serial.println();
     #endif
   }
+
+  return temp;
 }
 #endif
+
+uint8_t MinutesToIntervalCounts(uint64_t current_sensor_report_interval_ms, uint8_t mins)
+{
+    return static_cast<uint8_t>(static_cast<uint64_t>(mins)*60*1000/current_sensor_report_interval_ms);
+}
 
 void switchClock(unsigned char clk)
 {
