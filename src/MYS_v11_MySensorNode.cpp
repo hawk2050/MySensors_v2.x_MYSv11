@@ -175,7 +175,7 @@ void loop()
 
   uint8_t uvi;
   uint64_t update_interval_ms = DAY_UPDATE_INTERVAL_MS;
-  uint16_t night_count = 0;
+  static uint16_t night_count = 0;
   loopCount++;
   clockSwitchCount++;
   bool forceTransmit = true;
@@ -208,13 +208,13 @@ void loop()
   in a row before we switch our sleep interval to the night mode*/
   if (uvi == 0)
   {
-    ++night_count;  
+    ++night_count; 
+     
   }
   else
   {
     /*Some daylight is returning*/
     night_count = 0;
-
   }
 
   if(night_count > 10)
@@ -225,6 +225,7 @@ void loop()
   {
     update_interval_ms = DAY_UPDATE_INTERVAL_MS;
   }
+
   
 #endif
 
