@@ -99,7 +99,7 @@ uint8_t clockSwitchCount = 0;
 #if UV_SENSOR
 UVIS25 UV; //Ultraviolet sensor
 MyMessage msgUVindex(CHILD_ID_UV, V_UV);
-uint8_t readUVSensor(bool force);
+float readUVSensor();
 #endif
 
 #if TEMP_HUM_SENSOR
@@ -173,14 +173,11 @@ void presentation()
 void loop()
 {
 
-  uint8_t uvi;
+  float uvi;
   uint64_t update_interval_ms = DAY_UPDATE_INTERVAL_MS;
   static uint16_t night_count = 0;
   loopCount++;
   clockSwitchCount++;
-  bool forceTransmit = true;
-  
-  
   
   // When we wake up the 5th time after power on, switch to 1Mhz clock
   // This allows us to print debug messages on startup (as serial port is dependent on oscillator settings).
@@ -202,11 +199,12 @@ void loop()
 #endif
 
 #if UV_SENSOR
-  uvi = readUVSensor(forceTransmit);
+  uvi = readUVSensor();
+  
 
   /*If UVI is 0 then we're assuming it's late in day so readings aren't interesting. This has to happen several times
   in a row before we switch our sleep interval to the night mode*/
-  if (uvi == 0)
+  if (uvi < 0.1)
   {
     ++night_count; 
      
@@ -224,9 +222,9 @@ void loop()
   else
   {
     update_interval_ms = DAY_UPDATE_INTERVAL_MS;
+    send(msgUVindex.set(uvi,1));
   }
 
-  
 #endif
 
   sleep(update_interval_ms);
@@ -234,36 +232,13 @@ void loop()
 }
 
 #if UV_SENSOR
-uint8_t readUVSensor(bool force)
+float readUVSensor()
 {
-  static uint8_t lastUV = 0;
-
-  if (force)
-  {
-   lastUV = 200;
-  }
-  uint8_t temp = UV.readUV();
-
-  if(lastUV != temp)
-  {
-    float uv_flt = 1.0*temp/10;
-    send(msgUVindex.set(uv_flt,1));
-    lastUV = temp;
-    #if DEBUG_RCC
-    Serial.print(" UVI:");
-    Serial.print(uv_flt, 1);
-    Serial.println();
-    #endif
-  }
-
-  return temp;
+  return 1.0*UV.readUV()/10;
 }
 #endif
 
-uint8_t MinutesToIntervalCounts(uint64_t current_sensor_report_interval_ms, uint8_t mins)
-{
-    return static_cast<uint8_t>(static_cast<uint64_t>(mins)*60*1000/current_sensor_report_interval_ms);
-}
+
 
 void switchClock(unsigned char clk)
 {
