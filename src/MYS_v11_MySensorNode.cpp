@@ -234,7 +234,9 @@ void loop()
 #if UV_SENSOR
 float readUVSensor()
 {
-  return 1.0*UV.readUV()/10;
+  uint8_t temp = UV.readUV();
+  uint8_t temp2 = (temp >= 130) ? 130: temp;
+  return 1.0*temp2/10;
 }
 #endif
 
