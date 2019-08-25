@@ -115,7 +115,7 @@ MyMessage msgVolt(CHILD_ID_VOLTAGE, V_VOLTAGE);
 void switchClock(unsigned char clk);
 
 /*Set true to have clock throttle back, or false to not throttle*/
-bool highfreq = false;
+bool highfreq = true;
 
 BatteryLevel batt;
 /**********************************/
@@ -187,7 +187,8 @@ void loop()
      * to save power but more importantly to allow operation down to 1.8V
      * 
       */
-    switchClock(1<<CLKPS2); 
+    //switchClock(1<<CLKPS2); // divide by 16
+    switchClock(0x01); // divide by 2, to give 4MHz on 8MHz, 3V3 Pro Mini
   }
 
   uint16_t battLevel = batt.getVoltage();
