@@ -228,7 +228,7 @@ void loop()
 
 #endif
 
-  sleep(update_interval_ms);
+  sleep(update_interval_ms/2); //because we halve the clock frequency to 4MHz
 
 }
 
