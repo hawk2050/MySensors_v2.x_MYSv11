@@ -57,6 +57,8 @@ https://forum.mysensors.org/topic/4276/converting-a-sketch-from-1-5-x-to-2-0-x/2
   * This means we can use the default constructor without arguments when
   * creating an instance of the Mysensors class. Other defaults will include
   * transmitting on channel 76 with a data rate of 250kbps.
+  * MyGW1 = channel 76
+  * MyGW2 = channel 100
   */
  #define MY_RF24_CE_PIN 9
  #define MY_RF24_CS_PIN 10
