@@ -8,6 +8,20 @@ uint8_t UVIS25::init(void)
 	uint8_t ctrl_reg_values[3] = {0x01, 0x00, 0x00};
 	return writeReg(0x20, ctrl_reg_values, sizeof(ctrl_reg_values));
 }
+
+void applyPower(bool enable=true)
+{
+	DDRD |= 1<<2; // Configuring PD2 as Output- This needs to be in the init function. Preferably want to pass in the relevant PIN
+	if (enable)
+	{
+		PORTD |= 1<<2; // Writing HIGH to PD2
+	}
+	else
+	{
+		PORTD &= ~(1<<2); // Writing LOW to PB5
+	}
+		
+}
 uint8_t UVIS25::readUV()
 {
 	return readReg(0x28); 

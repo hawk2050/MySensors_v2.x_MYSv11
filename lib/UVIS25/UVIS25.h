@@ -1,6 +1,9 @@
 #include <stdint.h>
 #include <stdlib.h>
 
+/*Wired up Port D, Pin 2 as the voltage supply to the UVIS25 so that it can be placed in low power down mode
+when the AVR is sleeping. So we want a power up and a power down method*/
+
 #ifndef UVIS25_h
 #define UVIS25_h
 
@@ -13,6 +16,7 @@ public:
 	void readReg(uint8_t, uint8_t *, uint8_t);
 	uint8_t writeReg(uint8_t, uint8_t);
 	uint8_t writeReg(uint8_t, uint8_t *, size_t);
+	void applyPower(bool enable=true);
 	};
 	
 #endif
