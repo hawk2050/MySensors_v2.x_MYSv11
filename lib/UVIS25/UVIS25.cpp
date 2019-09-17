@@ -8,6 +8,8 @@ UVIS25::UVIS25(uint8_t powerPin)
 	_powerPin = powerPin;
 
 	hwPinMode(_powerPin, OUTPUT);
+	/*Turn power on to the device by default*/
+	hwDigitalWrite(_powerPin, true);
 }
 
 uint8_t UVIS25::init(void)
