@@ -64,6 +64,8 @@ https://forum.mysensors.org/topic/4276/converting-a-sketch-from-1-5-x-to-2-0-x/2
  #define MY_RF24_CS_PIN 10
  #define MY_RF24_CHANNEL 100
 
+ #define MY_UVIS25_POWER_PIN 2
+
 #include <MySensors.h> 
 #include <stdint.h>
 #include <math.h> 
@@ -99,7 +101,7 @@ uint8_t clockSwitchCount = 0;
 
 //Create an instance of the sensor objects
 #if UV_SENSOR
-UVIS25 UV; //Ultraviolet sensor
+UVIS25 UV(MY_UVIS25_POWER_PIN); //Ultraviolet sensor
 MyMessage msgUVindex(CHILD_ID_UV, V_UV);
 float readUVSensor();
 #endif

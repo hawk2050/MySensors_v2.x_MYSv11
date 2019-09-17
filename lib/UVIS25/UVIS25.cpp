@@ -3,14 +3,24 @@
 
 uint8_t UVIS25::sensorAddress = 0x47;
 
+UVIS25::UVIS25(uint8_t powerPin)
+{
+	_powerPin = powerPin;
+
+	hwPinMode(_powerPin, OUTPUT);
+}
+
 uint8_t UVIS25::init(void)
 {
 	uint8_t ctrl_reg_values[3] = {0x01, 0x00, 0x00};
 	return writeReg(0x20, ctrl_reg_values, sizeof(ctrl_reg_values));
 }
 
-void applyPower(bool enable=true)
+void UVIS25::applyPower(bool enable)
 {
+	
+	hwDigitalWrite(_powerPin, enable);
+	#if 0
 	DDRD |= 1<<2; // Configuring PD2 as Output- This needs to be in the init function. Preferably want to pass in the relevant PIN
 	if (enable)
 	{
@@ -20,6 +30,7 @@ void applyPower(bool enable=true)
 	{
 		PORTD &= ~(1<<2); // Writing LOW to PB5
 	}
+	#endif
 		
 }
 uint8_t UVIS25::readUV()
@@ -69,7 +80,7 @@ uint8_t aistin::readReg(uint8_t sensorAddress, uint8_t regAddress, uint8_t *regV
 			regValue[i] = Wire.read();
 	}
 	else {
-		for(size_t i=0 ; i<quanity ; i++){
+		for(uint8_t i=0 ; i<quanity ; i++){
 			Wire.write(regAddress+i);
 			Wire.endTransmission(false);
 			Wire.requestFrom(sensorAddress, (uint8_t)1);
