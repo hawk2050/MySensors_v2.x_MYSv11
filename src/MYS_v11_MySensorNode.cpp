@@ -53,6 +53,12 @@ https://forum.mysensors.org/topic/4276/converting-a-sketch-from-1-5-x-to-2-0-x/2
  #define MY_PARENT_NODE_ID 0
  #define MY_PARENT_NODE_IS_STATIC
 
+/**
+ * @def MY_TRANSPORT_WAIT_READY_MS
+ * @brief Timeout in ms until transport is ready during startup, set to 0 for no timeout
+ */
+ #define MY_TRANSPORT_WAIT_READY_MS (1000)
+
  /*These are actually the default pins expected by the MySensors framework.
   * This means we can use the default constructor without arguments when
   * creating an instance of the Mysensors class. Other defaults will include
