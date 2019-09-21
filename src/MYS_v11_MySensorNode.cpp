@@ -40,7 +40,7 @@ https://forum.mysensors.org/topic/4276/converting-a-sketch-from-1-5-x-to-2-0-x/2
  */
 
  // Enable debug prints to serial monitor
- //#define MY_DEBUG
+ #define MY_DEBUG
  #define DEBUG_RCC 0
 
  // Enable and select radio type attached
@@ -77,15 +77,15 @@ https://forum.mysensors.org/topic/4276/converting-a-sketch-from-1-5-x-to-2-0-x/2
 #include <math.h> 
 #include "SparkFunHTU21D.h"
 #include <Wire.h>
-#include <UVIS25.h>
+#include <UVSensor.hpp>
 #include <BatterySense.hpp>
 
 #define UV_SENSOR 1
 #define TEMP_HUM_SENSOR 0
 
 // Sleep time between sensor updates (in milliseconds)
-static const uint64_t DAY_UPDATE_INTERVAL_MS = 30000;
-static const uint64_t NIGHT_UPDATE_INTERVAL_MS = 900000;//15 mins
+static const uint32_t DAY_UPDATE_INTERVAL_MS = 30000;
+static const uint32_t NIGHT_UPDATE_INTERVAL_MS = 900000;//15 mins
 
 
 enum child_id_t
@@ -184,7 +184,7 @@ void loop()
 {
 
   float uvi;
-  uint64_t update_interval_ms = DAY_UPDATE_INTERVAL_MS;
+  uint32_t update_interval_ms = DAY_UPDATE_INTERVAL_MS;
   static uint16_t night_count = 0;
   loopCount++;
   clockSwitchCount++;
@@ -193,7 +193,7 @@ void loop()
   // This allows us to print debug messages on startup (as serial port is dependent on oscillator settings).
   if ( (clockSwitchCount == 5) && highfreq)
   {
-    /* Switch to 1Mhz by setting clock prescaler to divide by 16 for the reminder of the sketch, 
+    /* Switch to 4Mhz by setting clock prescaler to divide by 2 for the reminder of the sketch, 
      * to save power but more importantly to allow operation down to 1.8V
      * 
       */
@@ -218,27 +218,55 @@ void loop()
   if (uvi < 0.1)
   {
     ++night_count; 
+    #ifdef DEBUG_RCC
+    Serial.print("night_count:");
+    Serial.print(night_count, 1);
+    Serial.println();
+    #endif
      
   }
   else
   {
     /*Some daylight is returning*/
     night_count = 0;
+    #ifdef DEBUG_RCC
+    Serial.print("Reset night_count");
+    Serial.println();
+    #endif
   }
 
   if(night_count > 10)
   {
     update_interval_ms = NIGHT_UPDATE_INTERVAL_MS;
+    send(msgUVindex.set(uvi,1));
+    #ifdef DEBUG_RCC
+    Serial.print("Set sleep interval to Night Mode");
+    Serial.println();
+    #endif
   }
   else
   {
     update_interval_ms = DAY_UPDATE_INTERVAL_MS;
     send(msgUVindex.set(uvi,1));
+    #ifdef DEBUG_RCC
+    Serial.print("Set sleep interval to Day Mode");
+    Serial.println();
   }
 
 #endif
 
-  sleep(update_interval_ms/2); //because we halve the clock frequency to 4MHz
+  if ( (clockSwitchCount >= 5) && highfreq)
+  {
+    //because we halve the clock frequency to 4MHz
+    sleep(update_interval_ms/2); 
+  }
+  else
+  {
+    sleep(update_interval_ms);
+  }
+  
+
+  
 
 }
 
