@@ -107,7 +107,7 @@ uint8_t clockSwitchCount = 0;
 
 //Create an instance of the sensor objects
 #if UV_SENSOR
-UVIS25 UV(MY_UVIS25_POWER_PIN); //Ultraviolet sensor
+UVSensor UV(MY_UVIS25_POWER_PIN); //Ultraviolet sensor
 MyMessage msgUVindex(CHILD_ID_UV, V_UV);
 float readUVSensor();
 #endif
@@ -270,14 +270,7 @@ void loop()
 
 }
 
-#if UV_SENSOR
-float readUVSensor()
-{
-  uint8_t temp = UV.readUV();
-  uint8_t temp2 = (temp >= 130) ? 130: temp;
-  return 1.0*temp2/10;
-}
-#endif
+
 
 
 
