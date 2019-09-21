@@ -8,7 +8,8 @@ class UVSensor
 
     void init();
 
-    float get_uv_reading();
+    float read_sensor();
+    float get_uvi();
 
     void sleep();
     void wake();
