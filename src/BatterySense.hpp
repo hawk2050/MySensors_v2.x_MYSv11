@@ -1,3 +1,6 @@
+#ifndef _BATTERY_SENSE_HPP
+#define _BATTERY_SENSE_HPP
+
 #include <stdint.h>
 
 class BatteryLevel
@@ -12,3 +15,4 @@ class BatteryLevel
     uint16_t m_lastVoltage;
 
 };
+#endif

@@ -39,38 +39,38 @@ https://forum.mysensors.org/topic/4276/converting-a-sketch-from-1-5-x-to-2-0-x/2
 
  */
 
- // Enable debug prints to serial monitor
- #define MY_DEBUG
- #define DEBUG_RCC 0
+// Enable debug prints to serial monitor
+#define MY_DEBUG
+#define DEBUG_RCC 1
 
- // Enable and select radio type attached
- #define MY_RADIO_RF24
- //#define MY_RADIO_RFM69
+// Enable and select radio type attached
+#define MY_RADIO_RF24
+//#define MY_RADIO_RFM69
 
- #define MY_NODE_ID 21
- /*Makes this static so won't try and find another parent if communication with
- gateway fails*/
- #define MY_PARENT_NODE_ID 0
- #define MY_PARENT_NODE_IS_STATIC
+#define MY_NODE_ID 21
+/*Makes this static so won't try and find another parent if communication with
+gateway fails*/
+#define MY_PARENT_NODE_ID 0
+#define MY_PARENT_NODE_IS_STATIC
 
 /**
  * @def MY_TRANSPORT_WAIT_READY_MS
  * @brief Timeout in ms until transport is ready during startup, set to 0 for no timeout
  */
- #define MY_TRANSPORT_WAIT_READY_MS (1000)
+#define MY_TRANSPORT_WAIT_READY_MS (1000)
 
- /*These are actually the default pins expected by the MySensors framework.
-  * This means we can use the default constructor without arguments when
-  * creating an instance of the Mysensors class. Other defaults will include
-  * transmitting on channel 76 with a data rate of 250kbps.
-  * MyGW1 = channel 76
-  * MyGW2 = channel 100
-  */
- #define MY_RF24_CE_PIN 9
- #define MY_RF24_CS_PIN 10
- #define MY_RF24_CHANNEL 100
+/*These are actually the default pins expected by the MySensors framework.
+* This means we can use the default constructor without arguments when
+* creating an instance of the Mysensors class. Other defaults will include
+* transmitting on channel 76 with a data rate of 250kbps.
+* MyGW1 = channel 76
+* MyGW2 = channel 100
+*/
+#define MY_RF24_CE_PIN 9
+#define MY_RF24_CS_PIN 10
+#define MY_RF24_CHANNEL 100
 
- #define MY_UVIS25_POWER_PIN 2
+#define MY_UVIS25_POWER_PIN 2
 
 #include <MySensors.h> 
 #include <stdint.h>
@@ -98,8 +98,8 @@ enum child_id_t
 
 
 
-uint8_t loopCount = 0;
-uint8_t clockSwitchCount = 0;
+//uint32_t loopCount = 0;
+uint32_t clockSwitchCount = 0;
 
 /*****************************/
 /********* FUNCTIONS *********/
@@ -109,7 +109,7 @@ uint8_t clockSwitchCount = 0;
 #if UV_SENSOR
 UVSensor UV(MY_UVIS25_POWER_PIN); //Ultraviolet sensor
 MyMessage msgUVindex(CHILD_ID_UV, V_UV);
-float readUVSensor();
+
 #endif
 
 #if TEMP_HUM_SENSOR
@@ -125,7 +125,8 @@ MyMessage msgVolt(CHILD_ID_VOLTAGE, V_VOLTAGE);
 void switchClock(unsigned char clk);
 
 /*Set true to have clock throttle back, or false to not throttle*/
-bool highfreq = true;
+bool throttlefreq = true;
+bool cpu_is_throttled = false;
 
 BatteryLevel batt;
 /**********************************/
@@ -183,23 +184,32 @@ void presentation()
 void loop()
 {
 
-  float uvi;
   uint32_t update_interval_ms = DAY_UPDATE_INTERVAL_MS;
-  static uint16_t night_count = 0;
-  loopCount++;
+
+  //loopCount++;
   clockSwitchCount++;
+  #if DEBUG_RCC
+  Serial.print("clockSwitchCount = ");
+  Serial.print(clockSwitchCount,DEC);
+  Serial.println();
+  #endif
   
   // When we wake up the 5th time after power on, switch to 1Mhz clock
   // This allows us to print debug messages on startup (as serial port is dependent on oscillator settings).
-  if ( (clockSwitchCount == 5) && highfreq)
+  if ( (clockSwitchCount == 5) && throttlefreq)
   {
     /* Switch to 4Mhz by setting clock prescaler to divide by 2 for the reminder of the sketch, 
      * to save power but more importantly to allow operation down to 1.8V
      * 
       */
     //switchClock(1<<CLKPS2); // divide by 16
+    #if DEBUG_RCC
+    Serial.print("Setting CPU Freq to 4MHz");
+    Serial.println();
+    #endif
     switchClock(0x01); // divide by 2, to give 4MHz on 8MHz, 3V3 Pro Mini
-  }
+    cpu_is_throttled = true;
+  } //end if
 
   uint16_t battLevel = batt.getVoltage();
   send(msgVolt.set(battLevel,1));
@@ -210,36 +220,18 @@ void loop()
 #endif
 
 #if UV_SENSOR
-  uvi = readUVSensor();
+  UV.wake();
+  /*Give the voltage time to stabilise(?)*/
+  wait(40); //ms
+  UV.read_sensor();
   
+  send(msgUVindex.set(UV.get_uvi(),1));
+  UV.sleep();
 
-  /*If UVI is 0 then we're assuming it's late in day so readings aren't interesting. This has to happen several times
-  in a row before we switch our sleep interval to the night mode*/
-  if (uvi < 0.1)
-  {
-    ++night_count; 
-    #ifdef DEBUG_RCC
-    Serial.print("night_count:");
-    Serial.print(night_count, 1);
-    Serial.println();
-    #endif
-     
-  }
-  else
-  {
-    /*Some daylight is returning*/
-    night_count = 0;
-    #ifdef DEBUG_RCC
-    Serial.print("Reset night_count");
-    Serial.println();
-    #endif
-  }
-
-  if(night_count > 10)
+  if(UV.is_night())
   {
     update_interval_ms = NIGHT_UPDATE_INTERVAL_MS;
-    send(msgUVindex.set(uvi,1));
-    #ifdef DEBUG_RCC
+    #if DEBUG_RCC
     Serial.print("Set sleep interval to Night Mode");
     Serial.println();
     #endif
@@ -247,15 +239,15 @@ void loop()
   else
   {
     update_interval_ms = DAY_UPDATE_INTERVAL_MS;
-    send(msgUVindex.set(uvi,1));
-    #ifdef DEBUG_RCC
+    #if DEBUG_RCC
     Serial.print("Set sleep interval to Day Mode");
     Serial.println();
+    #endif
   }
+  
+#endif /*UV_SENSOR*/
 
-#endif
-
-  if ( (clockSwitchCount >= 5) && highfreq)
+  if ( cpu_is_throttled)
   {
     //because we halve the clock frequency to 4MHz
     sleep(update_interval_ms/2); 
@@ -263,12 +255,9 @@ void loop()
   else
   {
     sleep(update_interval_ms);
-  }
+  } //end if
   
-
-  
-
-}
+} //end loop
 
 
 
@@ -281,7 +270,7 @@ void switchClock(unsigned char clk)
   CLKPR = 1<<CLKPCE; // Set CLKPCE to enable clk switching
   CLKPR = clk;
   sei();
-  highfreq = false;
+  throttlefreq = false;
 }
 
 #if TEMP_HUM_SENSOR
