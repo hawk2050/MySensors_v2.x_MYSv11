@@ -40,8 +40,8 @@ https://forum.mysensors.org/topic/4276/converting-a-sketch-from-1-5-x-to-2-0-x/2
  */
 
 // Enable debug prints to serial monitor
-#define MY_DEBUG
-#define DEBUG_RCC 1
+//#define MY_DEBUG
+#define DEBUG_RCC 0
 
 // Enable and select radio type attached
 #define MY_RADIO_RF24
@@ -157,7 +157,9 @@ void setup()
 {
   
   Wire.begin();
+  #if UV_SENSOR
   UV.init();
+  #endif
   Serial.begin(9600);
   
 }
