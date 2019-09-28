@@ -80,7 +80,7 @@ gateway fails*/
 #include <UVSensor.hpp>
 #include <BatterySense.hpp>
 
-#define UV_SENSOR 1
+#define UV_SENSOR 0
 #define TEMP_HUM_SENSOR 0
 
 // Sleep time between sensor updates (in milliseconds)
