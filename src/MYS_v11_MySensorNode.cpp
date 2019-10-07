@@ -41,7 +41,7 @@ https://forum.mysensors.org/topic/4276/converting-a-sketch-from-1-5-x-to-2-0-x/2
 
 // Enable debug prints to serial monitor
 //#define MY_DEBUG
-#define DEBUG_RCC 1
+#define DEBUG_RCC 0
 
 // Enable and select radio type attached
 #define MY_RADIO_RF24
@@ -127,7 +127,7 @@ MyMessage msgVolt(CHILD_ID_VOLTAGE, V_VOLTAGE);
 void switchClock(unsigned char clk);
 
 /*Set true to have clock throttle back, or false to not throttle*/
-bool throttlefreq = false;
+bool throttlefreq = true;
 bool cpu_is_throttled = false;
 
 BatteryLevel batt;
@@ -252,15 +252,8 @@ void loop()
   
 #endif /*UV_SENSOR*/
 
-  if ( cpu_is_throttled)
-  {
-    //because we halve the clock frequency to 4MHz
-    sleep(update_interval_ms/2); 
-  }
-  else
-  {
-    sleep(update_interval_ms);
-  } //end if
+  sleep(update_interval_ms); 
+  
   
 } //end loop
 
