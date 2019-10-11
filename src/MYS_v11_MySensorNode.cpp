@@ -47,7 +47,7 @@ https://forum.mysensors.org/topic/4276/converting-a-sketch-from-1-5-x-to-2-0-x/2
 #define MY_RADIO_RF24
 //#define MY_RADIO_RFM69
 
-#define MY_NODE_ID 14
+#define MY_NODE_ID 11
 /*Makes this static so won't try and find another parent if communication with
 gateway fails*/
 #define MY_PARENT_NODE_ID 0
@@ -68,7 +68,7 @@ gateway fails*/
 */
 #define MY_RF24_CE_PIN 9
 #define MY_RF24_CS_PIN 10
-#define MY_RF24_CHANNEL 76
+#define MY_RF24_CHANNEL 100
 
 #define MY_UVIS25_POWER_PIN 2
 
@@ -84,10 +84,10 @@ gateway fails*/
 #define TEMP_HUM_SENSOR 1
 
 // Sleep time between sensor updates (in milliseconds)
-//static const uint32_t DAY_UPDATE_INTERVAL_MS = 30000;
+static const uint32_t DAY_UPDATE_INTERVAL_MS = 30000;
 static const uint32_t NIGHT_UPDATE_INTERVAL_MS = 900000;//15 mins
 
-static const uint32_t DAY_UPDATE_INTERVAL_MS = 10000;
+//static const uint32_t DAY_UPDATE_INTERVAL_MS = 10000;
 
 
 enum child_id_t
@@ -98,9 +98,6 @@ enum child_id_t
   CHILD_ID_VOLTAGE
 };
 
-
-
-//uint32_t loopCount = 0;
 uint32_t clockSwitchCount = 0;
 
 /*****************************/
@@ -109,12 +106,16 @@ uint32_t clockSwitchCount = 0;
 
 //Create an instance of the sensor objects
 #if UV_SENSOR
+const char sketchString[] = "mys_v11-uv";
 UVSensor UV(MY_UVIS25_POWER_PIN); //Ultraviolet sensor
 MyMessage msgUVindex(CHILD_ID_UV, V_UV);
 
 #endif
 
+
+
 #if TEMP_HUM_SENSOR
+const char sketchString[] = "mys_v11-temp_humid";
 HTU21D myHTU21D;
 MyMessage msgHum(CHILD_ID_HUMIDITY, V_HUM);
 MyMessage msgTemp(CHILD_ID_TEMP, V_TEMP);
@@ -162,7 +163,9 @@ void setup()
   #if UV_SENSOR
   UV.init();
   #endif
+  #if TEMP_HUM_SENSOR
   myHTU21D.begin();
+  #endif
   Serial.begin(9600);
   
 }
@@ -170,7 +173,7 @@ void setup()
 void presentation()
 {
    // Send the sketch version information to the gateway and Controller
-  sendSketchInfo("mys_v11-uv", "0.5");
+  sendSketchInfo(sketchString, "0.6");
   // Register all sensors to gateway (they will be created as child devices)
   present(CHILD_ID_VOLTAGE, S_MULTIMETER);
 
