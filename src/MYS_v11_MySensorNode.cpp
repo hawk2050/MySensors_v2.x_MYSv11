@@ -41,13 +41,13 @@ https://forum.mysensors.org/topic/4276/converting-a-sketch-from-1-5-x-to-2-0-x/2
 
 // Enable debug prints to serial monitor
 //#define MY_DEBUG
-#define DEBUG_RCC 0
+#define DEBUG_RCC 1
 
 // Enable and select radio type attached
 #define MY_RADIO_RF24
 //#define MY_RADIO_RFM69
 
-#define MY_NODE_ID 11
+#define MY_NODE_ID 21
 /*Makes this static so won't try and find another parent if communication with
 gateway fails*/
 #define MY_PARENT_NODE_ID 0
@@ -68,7 +68,7 @@ gateway fails*/
 */
 #define MY_RF24_CE_PIN 9
 #define MY_RF24_CS_PIN 10
-#define MY_RF24_CHANNEL 100
+#define MY_RF24_CHANNEL 76
 
 #define MY_UVIS25_POWER_PIN 2
 
@@ -80,14 +80,14 @@ gateway fails*/
 #include <UVSensor.hpp>
 #include <BatterySense.hpp>
 
-#define UV_SENSOR 0
-#define TEMP_HUM_SENSOR 1
+#define UV_SENSOR 1
+#define TEMP_HUM_SENSOR 0
 
 // Sleep time between sensor updates (in milliseconds)
-static const uint32_t DAY_UPDATE_INTERVAL_MS = 30000;
+//static const uint32_t DAY_UPDATE_INTERVAL_MS = 30000;
 static const uint32_t NIGHT_UPDATE_INTERVAL_MS = 900000;//15 mins
 
-//static const uint32_t DAY_UPDATE_INTERVAL_MS = 10000;
+static const uint32_t DAY_UPDATE_INTERVAL_MS = 10000;
 
 
 enum child_id_t
@@ -128,7 +128,7 @@ MyMessage msgVolt(CHILD_ID_VOLTAGE, V_VOLTAGE);
 void switchClock(unsigned char clk);
 
 /*Set true to have clock throttle back, or false to not throttle*/
-bool throttlefreq = true;
+bool throttlefreq = false;
 bool cpu_is_throttled = false;
 
 BatteryLevel batt;
@@ -210,7 +210,7 @@ void loop()
      * to save power but more importantly to allow operation down to 1.8V
      * 
       */
-    //switchClock(1<<CLKPS2); // divide by 16
+    
     #if DEBUG_RCC
     Serial.print("Setting CPU Freq to 4MHz");
     Serial.println();
@@ -228,12 +228,26 @@ void loop()
 #endif
 
 #if UV_SENSOR
+#if DEBUG_RCC
+    Serial.print("Power up UV sensor");
+    Serial.println();
+#endif
   UV.wake();
   /*Give the voltage time to stabilise(?)*/
   wait(40); //ms
   UV.read_sensor();
+
+#if DEBUG_RCC
+    Serial.print("UV reading is :");
+    Serial.print(UV.get_uvi(), 1);
+    Serial.println();
+#endif
   
   send(msgUVindex.set(UV.get_uvi(),1));
+#if DEBUG_RCC
+    Serial.print("Power down UV sensor");
+    Serial.println();
+#endif
   UV.sleep();
 
   if(UV.is_night())
