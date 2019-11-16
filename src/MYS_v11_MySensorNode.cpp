@@ -47,7 +47,7 @@ https://forum.mysensors.org/topic/4276/converting-a-sketch-from-1-5-x-to-2-0-x/2
 #define MY_RADIO_RF24
 //#define MY_RADIO_RFM69
 
-#define MY_NODE_ID 21
+#define MY_NODE_ID 9
 /*Makes this static so won't try and find another parent if communication with
 gateway fails*/
 #define MY_PARENT_NODE_ID 0
@@ -68,7 +68,7 @@ gateway fails*/
 */
 #define MY_RF24_CE_PIN 9
 #define MY_RF24_CS_PIN 10
-#define MY_RF24_CHANNEL 76
+#define MY_RF24_CHANNEL 100
 
 #define MY_UVIS25_POWER_PIN 2
 
@@ -80,14 +80,14 @@ gateway fails*/
 #include <UVSensor.hpp>
 #include <BatterySense.hpp>
 
-#define UV_SENSOR 1
-#define TEMP_HUM_SENSOR 0
+#define UV_SENSOR 0
+#define TEMP_HUM_SENSOR 1
 
 // Sleep time between sensor updates (in milliseconds)
-//static const uint32_t DAY_UPDATE_INTERVAL_MS = 30000;
+static const uint32_t DAY_UPDATE_INTERVAL_MS = 30000;
 static const uint32_t NIGHT_UPDATE_INTERVAL_MS = 900000;//15 mins
 
-static const uint32_t DAY_UPDATE_INTERVAL_MS = 10000;
+//static const uint32_t DAY_UPDATE_INTERVAL_MS = 10000;
 
 
 enum child_id_t
@@ -128,7 +128,7 @@ MyMessage msgVolt(CHILD_ID_VOLTAGE, V_VOLTAGE);
 void switchClock(unsigned char clk);
 
 /*Set true to have clock throttle back, or false to not throttle*/
-bool throttlefreq = false;
+bool throttlefreq = true;
 bool cpu_is_throttled = false;
 
 BatteryLevel batt;
@@ -194,7 +194,6 @@ void loop()
 
   uint32_t update_interval_ms = DAY_UPDATE_INTERVAL_MS;
 
-  //loopCount++;
   clockSwitchCount++;
   #if DEBUG_RCC
   Serial.print("clockSwitchCount = ");
@@ -217,6 +216,7 @@ void loop()
     #endif
     switchClock(0x01); // divide by 2, to give 4MHz on 8MHz, 3V3 Pro Mini
     cpu_is_throttled = true;
+    throttlefreq = false;
   } //end if
 
   uint16_t battLevel = batt.getVoltage();
@@ -285,7 +285,7 @@ void switchClock(unsigned char clk)
   CLKPR = 1<<CLKPCE; // Set CLKPCE to enable clk switching
   CLKPR = clk;
   sei();
-  throttlefreq = false;
+  
 }
 
 #if TEMP_HUM_SENSOR

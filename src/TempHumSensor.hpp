@@ -8,6 +8,6 @@
 class TempHumSensor
 {
     
-}
+};
 
 #endif
