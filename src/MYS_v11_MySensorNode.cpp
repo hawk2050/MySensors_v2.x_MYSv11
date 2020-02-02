@@ -40,7 +40,7 @@ https://forum.mysensors.org/topic/4276/converting-a-sketch-from-1-5-x-to-2-0-x/2
  */
 
 // Enable debug prints to serial monitor
-//#define MY_DEBUG
+#define MY_DEBUG
 #define DEBUG_RCC 1
 
 // Enable and select radio type attached
@@ -68,7 +68,7 @@ gateway fails*/
 */
 #define MY_RF24_CE_PIN 9
 #define MY_RF24_CS_PIN 10
-#define MY_RF24_CHANNEL 100
+#define MY_RF24_CHANNEL 76
 
 #define MY_UVIS25_POWER_PIN 2
 
@@ -230,13 +230,6 @@ void loop()
 #endif
 
 #if UV_SENSOR
-#if DEBUG_RCC
-    Serial.print("Power up UV sensor");
-    Serial.println();
-#endif
-  UV.wake();
-  /*Give the voltage time to stabilise(?)*/
-  wait(2500); //ms
   UV.read_sensor();
 
 #if DEBUG_RCC
@@ -250,25 +243,6 @@ void loop()
     Serial.print("Power down UV sensor");
     Serial.println();
 #endif
-  UV.sleep();
-
-  if(UV.is_night())
-  {
-    update_interval_ms = NIGHT_UPDATE_INTERVAL_MS;
-    #if DEBUG_RCC
-    Serial.print("Set sleep interval to Night Mode");
-    Serial.println();
-    #endif
-  }
-  else
-  {
-    update_interval_ms = DAY_UPDATE_INTERVAL_MS;
-    #if DEBUG_RCC
-    Serial.print("Set sleep interval to Day Mode");
-    Serial.println();
-    #endif
-  }
-  
 #endif /*UV_SENSOR*/
 
   sleep(update_interval_ms); 

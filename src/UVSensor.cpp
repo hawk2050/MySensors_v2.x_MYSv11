@@ -15,12 +15,12 @@ void UVSensor::init()
     m_UV->init();
 }
 
-void UVSensor::sleep()
+void UVSensor::power_down()
 {
     m_UV->applyPower(false);
 }
 
-void UVSensor::wake()
+void UVSensor::power_up()
 {
     m_UV->applyPower(true);
 }

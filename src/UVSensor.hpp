@@ -12,8 +12,8 @@ public:
     void init();
     float read_sensor();
     float get_uvi();
-    void sleep();
-    void wake();
+    void power_down();
+    void power_up();
     bool is_night();
 
 
