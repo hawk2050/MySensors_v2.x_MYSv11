@@ -47,7 +47,7 @@ https://forum.mysensors.org/topic/4276/converting-a-sketch-from-1-5-x-to-2-0-x/2
 #define MY_RADIO_RF24
 //#define MY_RADIO_RFM69
 
-#define MY_NODE_ID 21
+#define MY_NODE_ID 22
 /*Makes this static so won't try and find another parent if communication with
 gateway fails*/
 #define MY_PARENT_NODE_ID 0
@@ -80,8 +80,9 @@ gateway fails*/
 #include <UVSensor.hpp>
 #include <BatterySense.hpp>
 
-#define UV_SENSOR 1
-#define TEMP_HUM_SENSOR 0
+#define UV_SENSOR 0
+#define TEMP_HUM_SENSOR 1
+#define EXTERNAL_VOLTAGE_MONITOR 1 //Measure voltage at A0, resistive divider to reduce voltage at Mysv11 header J5, Pin 5.
 
 // Sleep time between sensor updates (in milliseconds)
 //static const uint32_t DAY_UPDATE_INTERVAL_MS = 30000;
@@ -97,7 +98,8 @@ enum child_id_t
   CHILD_ID_HUMIDITY,
   CHILD_ID_TEMP,
   CHILD_ID_UV,
-  CHILD_ID_VOLTAGE
+  CHILD_ID_VOLTAGE,
+  CHILD_ID_EXT_VOLTAGE
 };
 
 uint32_t clockSwitchCount = 0;
@@ -114,7 +116,13 @@ MyMessage msgUVindex(CHILD_ID_UV, V_UV);
 
 #endif
 
-
+#ifdef EXTERNAL_VOLTAGE_MONITOR
+int lastVoltage = 5000;                     // set to an arbitary number outside of expected voltage sensor range to ensure a change when first run
+int extVoltagePin = A0;                         // analog pin voltage sensor or voltage divider is connected to
+int extVoltSenseMax = 4300;                    // set to the maximum input voltage in millivolts of your voltage divider input   
+MyMessage msgExtVolt(CHILD_ID_EXT_VOLTAGE, V_VOLTAGE);
+int readExtVoltage;
+#endif
 
 #if TEMP_HUM_SENSOR
 const char sketchString[] = "mys_v11-temp_humid";
