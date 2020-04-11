@@ -121,7 +121,7 @@ int lastVoltage = 5000;                     // set to an arbitary number outside
 int extVoltagePin = A0;                         // analog pin voltage sensor or voltage divider is connected to
 int extVoltSenseMax = 4300;                    // set to the maximum input voltage in millivolts of your voltage divider input   
 MyMessage msgExtVolt(CHILD_ID_EXT_VOLTAGE, V_VOLTAGE);
-int readExtVoltage;
+void readExtVoltage(int pin, bool force);
 #endif
 
 #if TEMP_HUM_SENSOR
@@ -195,6 +195,10 @@ void presentation()
   present(CHILD_ID_HUMIDITY, S_HUM);
   present(CHILD_ID_TEMP, S_TEMP);
 #endif
+
+#ifdef EXTERNAL_VOLTAGE_MONITOR
+present(CHILD_ID_EXT_VOLTAGE, S_MULTIMETER);
+#endif
    
 }
 
@@ -236,6 +240,11 @@ void loop()
   readHTU21DTemperature(true);
   readHTU21DHumidity(true);
 #endif
+
+#ifdef EXTERNAL_VOLTAGE_MONITOR
+  readExtVoltage(extVoltagePin, true);
+#endif
+
 
 #if UV_SENSOR
   UV.read_sensor();
@@ -317,6 +326,37 @@ void readHTU21DHumidity(bool force)
     Serial.println();
     #endif
   }
+}
+
+#endif
+
+#if EXTERNAL_VOLTAGE_MONITOR
+#define NUM_SAMPLES 10
+void readExtVoltage(int pin, bool force)
+{
+  uint8_t sample_count = 0;
+  int sum = 0;
+  while (sample_count < NUM_SAMPLES)
+  {                                   // take a number of voltage samples  
+    sum += analogRead(pin);
+    sample_count++;
+    delay(10);
+  }
+
+  int voltageI = map(sum/NUM_SAMPLES,0,1023,0,extVoltSenseMax);              // map the reading and get our result in millivolts
+
+  #if DEBUG_RCC
+  Serial.print("sum count..."); Serial.println((sum / NUM_SAMPLES));      // print the count result. will be between 0 and 1023
+  Serial.print("mapped volts..."); Serial.println(voltageI / 1000.0, 1);  // convert millivolts back to volts and print. the 1 at the end determines how many decimal places to show
+  #endif
+  
+
+  //if ( voltageI != lastVoltage)
+  //{                                         // check if we have a new value. only send data if it is different
+  send(msgExtVolt.set(voltageI, 1));                  // voltagel is in millivolts so we divide by 1000 to convert back to volts and
+                                                                            // send voltage message to gateway with 1 decimal place
+  //  lastVoltage = voltageI;                                                // copy the current voltage reading for testing on the next loop 
+  //}
 }
 
 #endif
