@@ -41,13 +41,13 @@ https://forum.mysensors.org/topic/4276/converting-a-sketch-from-1-5-x-to-2-0-x/2
 
 // Enable debug prints to serial monitor
 //#define MY_DEBUG
-#define DEBUG_RCC 1
+#define DEBUG_RCC 0
 
 // Enable and select radio type attached
 #define MY_RADIO_RF24
 //#define MY_RADIO_RFM69
 
-#define MY_NODE_ID 22
+#define MY_NODE_ID 7
 /*Makes this static so won't try and find another parent if communication with
 gateway fails*/
 #define MY_PARENT_NODE_ID 0
@@ -82,13 +82,17 @@ gateway fails*/
 
 #define UV_SENSOR 0
 #define TEMP_HUM_SENSOR 1
-#define EXTERNAL_VOLTAGE_MONITOR 1 //Measure voltage at A0, resistive divider to reduce voltage at Mysv11 header J5, Pin 5.
+
+/*External voltage monitor is only really needed if you're powering the MCU from a voltage regulator but you want to monitor
+the battery or solar panel voltage that is feeding the regulator.
+*/
+#define EXTERNAL_VOLTAGE_MONITOR 0 //Measure voltage at A0, resistive divider to reduce voltage at Mysv11 header J5, Pin 5.
 
 // Sleep time between sensor updates (in milliseconds)
 //static const uint32_t DAY_UPDATE_INTERVAL_MS = 30000;
 //static const uint32_t DAY_UPDATE_INTERVAL_MS = 2500;
 
-static const uint32_t DAY_UPDATE_INTERVAL_MS = 10000;
+static const uint32_t DAY_UPDATE_INTERVAL_MS = 300000;
 
 
 enum child_id_t
@@ -114,7 +118,8 @@ MyMessage msgUVindex(CHILD_ID_UV, V_UV);
 
 #endif
 
-#ifdef EXTERNAL_VOLTAGE_MONITOR
+
+#if EXTERNAL_VOLTAGE_MONITOR
 int lastVoltage = 5000;                     // set to an arbitary number outside of expected voltage sensor range to ensure a change when first run
 int extVoltagePin = A0;                         // analog pin voltage sensor or voltage divider is connected to
 int extVoltSenseMax = 4200;                    // set to the maximum input voltage in millivolts of your voltage divider input   
@@ -194,7 +199,7 @@ void presentation()
   present(CHILD_ID_TEMP, S_TEMP);
 #endif
 
-#ifdef EXTERNAL_VOLTAGE_MONITOR
+#if EXTERNAL_VOLTAGE_MONITOR
 present(CHILD_ID_EXT_VOLTAGE, S_MULTIMETER);
 #endif
    
@@ -239,7 +244,7 @@ void loop()
   readHTU21DHumidity(true);
 #endif
 
-#ifdef EXTERNAL_VOLTAGE_MONITOR
+#if EXTERNAL_VOLTAGE_MONITOR
   readExtVoltage(extVoltagePin, true);
 #endif
 
