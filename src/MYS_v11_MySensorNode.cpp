@@ -47,7 +47,11 @@ https://forum.mysensors.org/topic/4276/converting-a-sketch-from-1-5-x-to-2-0-x/2
 #define MY_RADIO_RF24
 //#define MY_RADIO_RFM69
 
-#define MY_NODE_ID 7
+#ifdef HALL
+#define MY_NODE_ID 7  /*7 = Hall */
+#endif
+
+#define MY_NODE_ID 20 /*20 = Lily's room */
 /*Makes this static so won't try and find another parent if communication with
 gateway fails*/
 #define MY_PARENT_NODE_ID 0
@@ -69,8 +73,6 @@ gateway fails*/
 #define MY_RF24_CE_PIN 9
 #define MY_RF24_CS_PIN 10
 #define MY_RF24_CHANNEL 100
-
-#define MY_UVIS25_POWER_PIN 2
 
 #include <MySensors.h> 
 #include <stdint.h>
@@ -114,6 +116,7 @@ uint32_t clockSwitchCount = 0;
 
 //Create an instance of the sensor objects
 #if UV_SENSOR
+#define MY_UVIS25_POWER_PIN 2
 const char sketchString[] = "mys_v11-uv";
 UVSensor UV(MY_UVIS25_POWER_PIN); //Ultraviolet sensor
 MyMessage msgUVindex(CHILD_ID_UV, V_UV);
