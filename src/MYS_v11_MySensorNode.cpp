@@ -74,9 +74,11 @@ gateway fails*/
 #define MY_RF24_CS_PIN 10
 #define MY_RF24_CHANNEL 100
 
-#include <MySensors.h> 
 #include <stdint.h>
 #include <math.h> 
+#include <MySensors.h> 
+
+
 #include "SparkFunHTU21D.h"
 #include <Wire.h>
 #include <UVSensor.hpp>
@@ -106,7 +108,7 @@ enum child_id_t
   CHILD_ID_EXT_VOLTAGE
 };
 
-std::map<child_id_t, std::string> m {{CHILD_ID_HUMIDITY,"Humidity"}, {CHILD_ID_TEMP,"Temperature"}, {CHILD_ID_UV,"UV"}, {CHILD_ID_VOLTAGE,"MCU Voltage"}, {CHILD_ID_EXT_VOLTAGE,"External Voltage"}};
+//std::map<child_id_t, std::string> m {{CHILD_ID_HUMIDITY,"Humidity"}, {CHILD_ID_TEMP,"Temperature"}, {CHILD_ID_UV,"UV"}, {CHILD_ID_VOLTAGE,"MCU Voltage"}, {CHILD_ID_EXT_VOLTAGE,"External Voltage"}};
 
 uint32_t clockSwitchCount = 0;
 
