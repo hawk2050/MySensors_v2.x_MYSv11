@@ -46,6 +46,13 @@ https://forum.mysensors.org/topic/4276/converting-a-sketch-from-1-5-x-to-2-0-x/2
 // Enable and select radio type attached
 #define MY_RADIO_RF24
 //#define MY_RADIO_RFM69
+//#define MY_RADIO_RFM95
+
+#ifdef MY_RADIO_RFM95
+/*These are all the defaults anyway*/
+#define MY_RFM95_FREQUENCY RFM95_868MHZ
+#endif
+
 
 #ifdef HALL
 #define MY_NODE_ID 7  /*7 = Hall */
@@ -81,7 +88,7 @@ gateway fails*/
 
 #include "SparkFunHTU21D.h"
 #include <Wire.h>
-#include <UVSensor.hpp>
+
 #include <BatterySense.hpp>
 
 #define UV_SENSOR 0
@@ -118,6 +125,7 @@ uint32_t clockSwitchCount = 0;
 
 //Create an instance of the sensor objects
 #if UV_SENSOR
+#include <UVSensor.hpp>
 #define MY_UVIS25_POWER_PIN 2
 const char sketchString[] = "mys_v11-uv";
 UVSensor UV(MY_UVIS25_POWER_PIN); //Ultraviolet sensor
