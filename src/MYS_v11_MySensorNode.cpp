@@ -44,21 +44,24 @@ https://forum.mysensors.org/topic/4276/converting-a-sketch-from-1-5-x-to-2-0-x/2
 #define DEBUG_RCC 0
 
 // Enable and select radio type attached
-#define MY_RADIO_RF24
+//#define MY_RADIO_RF24
 //#define MY_RADIO_RFM69
-//#define MY_RADIO_RFM95
+#define MY_RADIO_RFM95
 
 #ifdef MY_RADIO_RFM95
 /*These are all the defaults anyway*/
 #define MY_RFM95_FREQUENCY RFM95_868MHZ
 #endif
 
+#define MY_NODE_ID 24
 
 #ifdef HALL
 #define MY_NODE_ID 7  /*7 = Hall */
 #endif
 
+#ifdef LILY
 #define MY_NODE_ID 20 /*20 = Lily's room */
+#endif
 /*Makes this static so won't try and find another parent if communication with
 gateway fails*/
 #define MY_PARENT_NODE_ID 0
@@ -77,9 +80,11 @@ gateway fails*/
 * MyGW1 = channel 76
 * MyGW2 = channel 100
 */
+#ifdef MY_RADIO_RF24
 #define MY_RF24_CE_PIN 9
 #define MY_RF24_CS_PIN 10
 #define MY_RF24_CHANNEL 100
+#endif
 
 #include <stdint.h>
 #include <math.h> 
@@ -101,9 +106,9 @@ the battery or solar panel voltage that is feeding the regulator.
 
 // Sleep time between sensor updates (in milliseconds)
 //static const uint32_t DAY_UPDATE_INTERVAL_MS = 30000;
-//static const uint32_t DAY_UPDATE_INTERVAL_MS = 2500;
+static const uint32_t DAY_UPDATE_INTERVAL_MS = 2500;
 
-static const uint32_t DAY_UPDATE_INTERVAL_MS = 300000;
+//static const uint32_t DAY_UPDATE_INTERVAL_MS = 300000;
 
 
 enum child_id_t
