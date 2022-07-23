@@ -40,7 +40,7 @@ https://forum.mysensors.org/topic/4276/converting-a-sketch-from-1-5-x-to-2-0-x/2
  */
 
 // Enable debug prints to serial monitor
-//#define MY_DEBUG
+#define MY_DEBUG
 #define DEBUG_RCC 0
 
 // Enable and select radio type attached
@@ -51,6 +51,8 @@ https://forum.mysensors.org/topic/4276/converting-a-sketch-from-1-5-x-to-2-0-x/2
 #ifdef MY_RADIO_RFM95
 /*These are all the defaults anyway*/
 #define MY_RFM95_FREQUENCY RFM95_868MHZ
+#define MY_RFM95_ATC_TARGET_RSSI_DBM (-70)  // target RSSI -70dBm
+#define MY_RFM95_MAX_POWER_LEVEL_DBM (10)   // max. TX power 10dBm = 10mW
 #endif
 
 #define MY_NODE_ID 24
@@ -319,7 +321,7 @@ void readHTU21DTemperature(bool force)
   {
     send(msgTemp.set(temp,1));
     lastTemp = temp;
-    #ifdef DEBUG_RCC
+    #if DEBUG_RCC
     Serial.print(" Temperature:");
     Serial.print(temp, 1);
     Serial.print("C");
@@ -342,7 +344,7 @@ void readHTU21DHumidity(bool force)
   {
     send(msgHum.set(humd,1));
     lastHumidity = humd;
-    #ifdef DEBUG_RCC
+    #if DEBUG_RCC
     Serial.print(" Humidity:");
     Serial.print(humd, 1);
     Serial.print("%");
