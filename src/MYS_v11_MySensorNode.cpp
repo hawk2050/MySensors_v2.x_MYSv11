@@ -43,10 +43,22 @@ https://forum.mysensors.org/topic/4276/converting-a-sketch-from-1-5-x-to-2-0-x/2
 #define MY_DEBUG
 #define DEBUG_RCC 0
 
+// Enable signal report functionalities
+#define MY_SIGNAL_REPORT_ENABLED
+
 // Enable and select radio type attached
 //#define MY_RADIO_RF24
 //#define MY_RADIO_RFM69
 #define MY_RADIO_RFM95
+
+#ifdef MY_RADIO_RFM69
+// RFM69
+//#define MY_RADIO_RFM69
+//#define MY_RFM69_NEW_DRIVER   // ATC on RFM69 works only with the new driver (not compatible with old=default driver)
+//#define MY_RFM69_ATC_TARGET_RSSI_DBM (-70)  // target RSSI -70dBm
+//#define MY_RFM69_MAX_POWER_LEVEL_DBM (10)   // max. TX power 10dBm = 10mW
+
+#endif
 
 #ifdef MY_RADIO_RFM95
 /*These are all the defaults anyway*/
@@ -55,7 +67,7 @@ https://forum.mysensors.org/topic/4276/converting-a-sketch-from-1-5-x-to-2-0-x/2
 #define MY_RFM95_MAX_POWER_LEVEL_DBM (10)   // max. TX power 10dBm = 10mW
 #endif
 
-#define MY_NODE_ID 24
+#define MY_NODE_ID 8
 
 #ifdef HALL
 #define MY_NODE_ID 7  /*7 = Hall */
@@ -108,7 +120,7 @@ the battery or solar panel voltage that is feeding the regulator.
 
 // Sleep time between sensor updates (in milliseconds)
 //static const uint32_t DAY_UPDATE_INTERVAL_MS = 30000;
-static const uint32_t DAY_UPDATE_INTERVAL_MS = 2500;
+static const uint32_t DAY_UPDATE_INTERVAL_MS = 10000;
 
 //static const uint32_t DAY_UPDATE_INTERVAL_MS = 300000;
 
@@ -119,8 +131,26 @@ enum child_id_t
   CHILD_ID_TEMP,
   CHILD_ID_UV,
   CHILD_ID_VOLTAGE,
-  CHILD_ID_EXT_VOLTAGE
+  CHILD_ID_EXT_VOLTAGE,
+  CHILD_ID_UPLINK_QUALITY,
+  CHILD_ID_TX_LEVEL,       
+  CHILD_ID_TX_PERCENT,
+  CHILD_ID_TX_RSSI,
+  CHILD_ID_RX_RSSI,
+  CHILD_ID_TX_SNR,
+  CHILD_ID_RX_SNR
 };
+
+#ifdef MY_SIGNAL_REPORT_ENABLED
+// Initialize general message
+MyMessage msgTxRSSI(CHILD_ID_TX_RSSI, V_CUSTOM);
+MyMessage msgRxRSSI(CHILD_ID_RX_RSSI, V_CUSTOM);
+MyMessage msgTxSNR(CHILD_ID_TX_SNR, V_CUSTOM);
+MyMessage msgRxSNR(CHILD_ID_RX_SNR, V_CUSTOM);
+MyMessage msgTxLevel(CHILD_ID_TX_LEVEL, V_CUSTOM);
+MyMessage msgTxPercent(CHILD_ID_TX_PERCENT, V_CUSTOM);
+MyMessage msgUplinkQuality(CHILD_ID_UPLINK_QUALITY, V_CUSTOM);
+#endif
 
 //std::map<child_id_t, std::string> m {{CHILD_ID_HUMIDITY,"Humidity"}, {CHILD_ID_TEMP,"Temperature"}, {CHILD_ID_UV,"UV"}, {CHILD_ID_VOLTAGE,"MCU Voltage"}, {CHILD_ID_EXT_VOLTAGE,"External Voltage"}};
 
@@ -201,7 +231,7 @@ void setup()
   #if TEMP_HUM_SENSOR
   myHTU21D.begin();
   #endif
-  Serial.begin(9600);
+  Serial.begin(115200);
   
 }
 
@@ -210,21 +240,31 @@ void presentation()
    // Send the sketch version information to the gateway and Controller
   sendSketchInfo(sketchString, "0.6");
   // Register all sensors to gateway (they will be created as child devices)
-  present(CHILD_ID_VOLTAGE, S_MULTIMETER);
+  present(CHILD_ID_VOLTAGE, S_MULTIMETER, "BATT VOLT mV");
 
 #if UV_SENSOR
   present(CHILD_ID_UV, S_UV);
 #endif
 
 #if TEMP_HUM_SENSOR
-  present(CHILD_ID_HUMIDITY, S_HUM);
-  present(CHILD_ID_TEMP, S_TEMP);
+  present(CHILD_ID_HUMIDITY, S_HUM, "REL HUM %");
+  present(CHILD_ID_TEMP, S_TEMP, "TEMP degC");
 #endif
 
 #if EXTERNAL_VOLTAGE_MONITOR
 present(CHILD_ID_EXT_VOLTAGE, S_MULTIMETER);
 #endif
-   
+
+#ifdef MY_SIGNAL_REPORT_ENABLED
+// Register all sensors to gw (they will be created as child devices)
+	present(CHILD_ID_UPLINK_QUALITY, S_CUSTOM, "UPLINK QUALITY RSSI");
+	present(CHILD_ID_TX_LEVEL, S_CUSTOM, "TX LEVEL DBM");
+	present(CHILD_ID_TX_PERCENT, S_CUSTOM, "TX LEVEL PERCENT");
+	present(CHILD_ID_TX_RSSI, S_CUSTOM, "TX RSSI");
+	present(CHILD_ID_RX_RSSI, S_CUSTOM, "RX RSSI");
+	present(CHILD_ID_TX_SNR, S_CUSTOM, "TX SNR");
+	present(CHILD_ID_RX_SNR, S_CUSTOM, "RX SNR");
+#endif   
 }
 
 
@@ -260,6 +300,18 @@ void loop()
 
   uint16_t battLevel = batt.getVoltage();
   send(msgVolt.set(battLevel,1));
+
+#ifdef MY_SIGNAL_REPORT_ENABLED
+  // send messages to GW
+	send(msgUplinkQuality.set(transportGetSignalReport(SR_UPLINK_QUALITY)));
+	send(msgTxLevel.set(transportGetSignalReport(SR_TX_POWER_LEVEL)));
+	send(msgTxPercent.set(transportGetSignalReport(SR_TX_POWER_PERCENT)));
+	// retrieve RSSI / SNR reports from incoming ACK
+	send(msgTxRSSI.set(transportGetSignalReport(SR_TX_RSSI)));
+	send(msgRxRSSI.set(transportGetSignalReport(SR_RX_RSSI)));
+	send(msgTxSNR.set(transportGetSignalReport(SR_TX_SNR)));
+	send(msgRxSNR.set(transportGetSignalReport(SR_RX_SNR)));
+#endif
 
 #if TEMP_HUM_SENSOR
   readHTU21DTemperature(true);
