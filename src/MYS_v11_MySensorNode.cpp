@@ -40,11 +40,11 @@ https://forum.mysensors.org/topic/4276/converting-a-sketch-from-1-5-x-to-2-0-x/2
  */
 
 // Enable debug prints to serial monitor
-#define MY_DEBUG
+//#define MY_DEBUG
 #define DEBUG_RCC 0
 
 // Enable signal report functionalities
-#define MY_SIGNAL_REPORT_ENABLED
+//#define MY_SIGNAL_REPORT_ENABLED
 
 // Enable and select radio type attached
 //#define MY_RADIO_RF24
@@ -119,8 +119,8 @@ the battery or solar panel voltage that is feeding the regulator.
 #define EXTERNAL_VOLTAGE_MONITOR 0 //Measure voltage at A0, resistive divider to reduce voltage at Mysv11 header J5, Pin 5.
 
 // Sleep time between sensor updates (in milliseconds)
-//static const uint32_t DAY_UPDATE_INTERVAL_MS = 30000;
-static const uint32_t DAY_UPDATE_INTERVAL_MS = 10000;
+static const uint32_t DAY_UPDATE_INTERVAL_MS = 30000;
+//static const uint32_t DAY_UPDATE_INTERVAL_MS = 10000;
 
 //static const uint32_t DAY_UPDATE_INTERVAL_MS = 300000;
 
