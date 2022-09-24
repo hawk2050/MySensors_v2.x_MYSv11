@@ -97,7 +97,8 @@ gateway fails*/
 #ifdef MY_RADIO_RF24
 #define MY_RF24_CE_PIN 9
 #define MY_RF24_CS_PIN 10
-#define MY_RF24_CHANNEL 100
+//#define MY_RF24_CHANNEL 100
+#define MY_RF24_CHANNEL 76
 #endif
 
 #include <stdint.h>
@@ -119,10 +120,10 @@ the battery or solar panel voltage that is feeding the regulator.
 #define EXTERNAL_VOLTAGE_MONITOR 0 //Measure voltage at A0, resistive divider to reduce voltage at Mysv11 header J5, Pin 5.
 
 // Sleep time between sensor updates (in milliseconds)
-static const uint32_t DAY_UPDATE_INTERVAL_MS = 30000;
-//static const uint32_t DAY_UPDATE_INTERVAL_MS = 10000;
+//static const uint32_t DAY_UPDATE_INTERVAL_MS = 60000;
+//static const uint32_t DAY_UPDATE_INTERVAL_MS = 5000;
 
-//static const uint32_t DAY_UPDATE_INTERVAL_MS = 300000;
+static const uint32_t DAY_UPDATE_INTERVAL_MS = 300000;
 
 
 enum child_id_t
